@@ -60,7 +60,6 @@
 </template>
 
 <script>
-  import { once } from 'wind-dom/src/event';
   import { addClass, removeClass } from 'wind-dom/src/class';
 
   export default {
@@ -154,50 +153,54 @@
       translate(element, offset, speed, callback) {
         if (speed) {
           this.animating = true;
-          element.style.webkitTransition = '-webkit-transform ' + speed + 'ms ease-in-out';
-          setTimeout(() => {
-            element.style.webkitTransform = `translate3d(${offset}px, 0, 0)`;
-          }, 50);
+                               element.style.webkitTransition = '-webkit-transform ' + speed + 'ms ease-in-out';
+                               setTimeout(() => {
+                                 element.style.webkitTransform = `translate3d(${offset}px, 0, 0)`;
+                               }, 50);
 
-          var called = false;
+                               var called = false;
 
-          var transitionEndCallback = () => {
-            if (called) return;
-            called = true;
-            this.animating = false;
-            element.style.webkitTransition = '';
-            element.style.webkitTransform = '';
-            if (callback) {
-              callback.apply(this, arguments);
-            }
-          };
+                               var transitionEndCallback = () => {
+                                 if (called) return;
+                                 called = true;
+                                 this.animating = false;
+                                 element.style.webkitTransition = '';
+                                 element.style.webkitTransform = '';
+                                 if (callback) {
+                                   callback.apply(this, arguments);
+                                 }
+                               };
 
-          once(element, 'webkitTransitionEnd', transitionEndCallback);
-          setTimeout(transitionEndCallback, speed + 100); // webkitTransitionEnd maybe not fire on lower version android.
+                               if(document.addEventListener) {
+                                 element.addEventListener('webkitTransitionEnd', transitionEndCallback, false);
+                               }else{
+                                 element.attachEvent('onwebkitTransitionEnd', transitionEndCallback);
+                               }
+                               setTimeout(transitionEndCallback, speed + 100); // webkitTransitionEnd maybe not fire on lower version android.
         } else {
           element.style.webkitTransition = '';
-          element.style.webkitTransform = `translate3d(${offset}px, 0, 0)`;
+                                             element.style.webkitTransform = `translate3d(${offset}px, 0, 0)`;
         }
       },
 
       reInitPages() {
         var children = this.$children;
-        this.noDrag = children.length === 1 && this.noDragWhenSingle;
+                                     this.noDrag = children.length === 1 && this.noDragWhenSingle;
 
-        var pages = [];
-        this.index = this.defaultIndex;
+                                     var pages = [];
+                                     this.index = this.defaultIndex;
 
-        children.forEach((child, index) => {
-          pages.push(child.$el);
+                                     children.forEach((child, index) => {
+                                       pages.push(child.$el);
 
-          removeClass(child.$el, 'is-active');
+                                                            removeClass(child.$el, 'is-active');
 
-          if (index === this.defaultIndex) {
-            addClass(child.$el, 'is-active');
-          }
-        });
+                                                            if (index === this.defaultIndex) {
+                                                              addClass(child.$el, 'is-active');
+                                                            }
+                                     });
 
-        this.pages = pages;
+                                     this.pages = pages;
       },
 
       doAnimate(towards, options) {
@@ -212,38 +215,38 @@
 
         if (!options || towards === 'goto') {
           options = options || {};
-          pageWidth = this.$el.clientWidth;
-          currentPage = pages[index];
-          if (towards === 'goto') {
-            prevPage = options.prevPage;
-            nextPage = options.nextPage;
-          } else {
-            prevPage = pages[index - 1];
-            nextPage = pages[index + 1];
-          }
+                                 pageWidth = this.$el.clientWidth;
+                                 currentPage = pages[index];
+                                 if (towards === 'goto') {
+                                   prevPage = options.prevPage;
+                                                              nextPage = options.nextPage;
+                                 } else {
+                                   prevPage = pages[index - 1];
+                                                              nextPage = pages[index + 1];
+                                 }
 
-          if (this.continuous && pages.length > 1) {
-            if (!prevPage) {
-              prevPage = pages[pages.length - 1];
-            }
-            if (!nextPage) {
-              nextPage = pages[0];
-            }
-          }
-          if (prevPage) {
-            prevPage.style.display = 'block';
-            this.translate(prevPage, -pageWidth);
-          }
-          if (nextPage) {
-            nextPage.style.display = 'block';
-            this.translate(nextPage, pageWidth);
-          }
+                                 if (this.continuous && pages.length > 1) {
+                                   if (!prevPage) {
+                                     prevPage = pages[pages.length - 1];
+                                   }
+                                   if (!nextPage) {
+                                     nextPage = pages[0];
+                                   }
+                                 }
+                                 if (prevPage) {
+                                   prevPage.style.display = 'block';
+                                                                   this.translate(prevPage, -pageWidth);
+                                 }
+                                 if (nextPage) {
+                                   nextPage.style.display = 'block';
+                                                                   this.translate(nextPage, pageWidth);
+                                 }
         } else {
           prevPage = options.prevPage;
-          currentPage = options.currentPage;
-          nextPage = options.nextPage;
-          pageWidth = options.pageWidth;
-          offsetLeft = options.offsetLeft;
+                                     currentPage = options.currentPage;
+                                     nextPage = options.nextPage;
+                                     pageWidth = options.pageWidth;
+                                     offsetLeft = options.offsetLeft;
         }
 
         var newIndex;
@@ -273,12 +276,12 @@
         var callback = () => {
           if (newIndex !== undefined) {
             var newPage = this.$children[newIndex].$el;
-            removeClass(oldPage, 'is-active');
-            addClass(newPage, 'is-active');
+                                                      removeClass(oldPage, 'is-active');
+                                                      addClass(newPage, 'is-active');
 
-            this.index = newIndex;
+                                                      this.index = newIndex;
 
-            this.$emit('change', newIndex, index);
+                                                      this.$emit('change', newIndex, index);
           }
 
           if (prevPage) {
@@ -293,39 +296,39 @@
         setTimeout(() => {
           if (towards === 'next') {
             this.translate(currentPage, -pageWidth, speed, callback);
-            if (nextPage) {
-              this.translate(nextPage, 0, speed);
-            }
+                                                                    if (nextPage) {
+                                                                      this.translate(nextPage, 0, speed);
+                                                                    }
           } else if (towards === 'prev') {
             this.translate(currentPage, pageWidth, speed, callback);
-            if (prevPage) {
-              this.translate(prevPage, 0, speed);
-            }
+                                                                   if (prevPage) {
+                                                                     this.translate(prevPage, 0, speed);
+                                                                   }
           } else if (towards === 'goto') {
             if (prevPage) {
               this.translate(currentPage, pageWidth, speed, callback);
-              this.translate(prevPage, 0, speed);
+                                                                     this.translate(prevPage, 0, speed);
             } else if (nextPage) {
               this.translate(currentPage, -pageWidth, speed, callback);
-              this.translate(nextPage, 0, speed);
+                                                                      this.translate(nextPage, 0, speed);
             }
           } else {
             this.translate(currentPage, 0, speed, callback);
-            if (typeof offsetLeft !== 'undefined') {
-              if (prevPage && offsetLeft > 0) {
-                this.translate(prevPage, pageWidth * -1, speed);
-              }
-              if (nextPage && offsetLeft < 0) {
-                this.translate(nextPage, pageWidth, speed);
-              }
-            } else {
-              if (prevPage) {
-                this.translate(prevPage, pageWidth * -1, speed);
-              }
-              if (nextPage) {
-                this.translate(nextPage, pageWidth, speed);
-              }
-            }
+                                                           if (typeof offsetLeft !== 'undefined') {
+                                                             if (prevPage && offsetLeft > 0) {
+                                                               this.translate(prevPage, pageWidth * -1, speed);
+                                                             }
+                                                             if (nextPage && offsetLeft < 0) {
+                                                               this.translate(nextPage, pageWidth, speed);
+                                                             }
+                                                           } else {
+                                                             if (prevPage) {
+                                                               this.translate(prevPage, pageWidth * -1, speed);
+                                                             }
+                                                             if (nextPage) {
+                                                               this.translate(nextPage, pageWidth, speed);
+                                                             }
+                                                           }
           }
         }, 10);
       },
@@ -412,10 +415,10 @@
         var distanceY = Math.abs(offsetTop);
         if (distanceX < 5 || (distanceX >= 5 && distanceY >= 1.73 * distanceX)) {
           this.userScrolling = true;
-          return;
+                                   return;
         } else {
           this.userScrolling = false;
-          event.preventDefault();
+                                    event.preventDefault();
         }
         offsetLeft = Math.min(Math.max(-dragState.pageWidth + 1, offsetLeft), dragState.pageWidth - 1);
 
@@ -430,9 +433,9 @@
           // limit swipe width with quadratic-functional ease
           // y = (-1 / dk) x (|x| - 2k)
           const k = dragState.pageWidth;
-          const x = offsetLeft;
-          const d = 6; // scroll until 1/d of screenWidth at maximum
-          offsetLeft = -1 / d / k * x * (Math.abs(x) - 2 * k);
+                                       const x = offsetLeft;
+                                       const d = 6; // scroll until 1/d of screenWidth at maximum
+                                       offsetLeft = -1 / d / k * x * (Math.abs(x) - 2 * k);
         }
         this.translate(dragState.dragPage, offsetLeft);
       },
@@ -453,12 +456,12 @@
 
         if (dragDuration < 300) {
           let fireTap = Math.abs(offsetLeft) < 5 && Math.abs(offsetTop) < 5;
-          if (isNaN(offsetLeft) || isNaN(offsetTop)) {
-            fireTap = true;
-          }
-          if (fireTap) {
-            this.$children[this.index].$emit('tap');
-          }
+                                                                           if (isNaN(offsetLeft) || isNaN(offsetTop)) {
+                                                                             fireTap = true;
+                                                                           }
+                                                                           if (fireTap) {
+                                                                             this.$children[this.index].$emit('tap');
+                                                                           }
         }
 
         if (dragDuration < 300 && dragState.currentLeft === undefined) return;
@@ -509,8 +512,8 @@
       dragEndEvent(event) {
         if (this.userScrolling) {
           this.dragging = false;
-          this.dragState = {};
-          return;
+                               this.dragState = {};
+                               return;
         }
         if (!this.dragging) return;
         this.doOnTouchEnd(event);
@@ -521,37 +524,37 @@
     destroyed() {
       if (this.timer) {
         clearInterval(this.timer);
-        this.timer = null;
+                                 this.timer = null;
       }
       if (this.reInitTimer) {
         clearTimeout(this.reInitTimer);
-        this.reInitTimer = null;
+                                      this.reInitTimer = null;
       }
     },
 
     mounted() {
       this.ready = true;
 
-      if (this.auto > 0) {
-        this.timer = setInterval(() => {
-          if (!this.dragging && !this.animating) {
-            this.next();
-          }
-        }, this.auto);
-      }
+                       if (this.auto > 0) {
+                         this.timer = setInterval(() => {
+                           if (!this.dragging && !this.animating) {
+                             this.next();
+                           }
+                         }, this.auto);
+                       }
 
-      this.reInitPages();
+                       this.reInitPages();
 
-      var element = this.$el;
+                       var element = this.$el;
 
-      // for mobile
-      element.addEventListener('touchstart', this.dragStartEvent);
-      element.addEventListener('touchmove', this.dragMoveEvent);
-      element.addEventListener('touchend', this.dragEndEvent);
-      // for pc
-      element.addEventListener('mousedown', this.dragStartEvent);
-      element.addEventListener('mousemove', this.dragMoveEvent);
-      element.addEventListener('mouseup', this.dragEndEvent);
+                       // for mobile
+                       element.addEventListener('touchstart', this.dragStartEvent);
+                       element.addEventListener('touchmove', this.dragMoveEvent);
+                       element.addEventListener('touchend', this.dragEndEvent);
+                       // for pc
+                       element.addEventListener('mousedown', this.dragStartEvent);
+                       element.addEventListener('mousemove', this.dragMoveEvent);
+                       element.addEventListener('mouseup', this.dragEndEvent);
     }
   };
 </script>
