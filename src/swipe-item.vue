@@ -1,19 +1,19 @@
 <template>
   <div class="mint-swipe-item">
-    <slot></slot>
+    <slot/>
   </div>
 </template>
 
 <script>
-  export default {
-    name: 'mt-swipe-item',
+export default {
+  name: 'MtSwipeItem',
 
-    mounted() {
-      this.$parent && this.$parent.swipeItemCreated(this);
-    },
+  mounted() {
+    if (this.$parent) this.$parent.swipeItemCreated(this);
+  },
 
-    destroyed() {
-      this.$parent && this.$parent.swipeItemDestroyed(this);
-    }
-  };
+  destroyed() {
+    if (this.$parent) this.$parent.swipeItemDestroyed(this);
+  },
+};
 </script>

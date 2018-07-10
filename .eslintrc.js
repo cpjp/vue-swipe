@@ -9,7 +9,7 @@ module.exports = {
   env: {
     browser: true,
   },
-  extends: ['plugin:vue/recommended'],
+  extends: ['airbnb-base', 'plugin:vue/recommended'],
   plugins: ['vue'],
   // add your custom rules here
   rules: {
